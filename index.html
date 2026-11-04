@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}InterviewMate AI &mdash; Your Personal AI Interview Trainer{% endblock %}
+
+{% block content %}
+
+<!-- ══ HERO ══════════════════════════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="hero-badge">Powered by IBM Granite &amp; watsonx.ai</div>
+  <h1>Ace Your Next Interview<br>with AI-Powered Practice</h1>
+  <p>
+    InterviewMate AI generates personalised interview questions, evaluates your answers
+    in real time, and gives you detailed feedback &mdash; so you walk into every interview
+    with confidence.
+  </p>
+  <div class="hero-buttons">
+    <a href="{{ url_for('interview.setup') }}" class="btn-hero-primary">
+      Start Practice Interview &#8594;
+    </a>
+    <a href="{{ url_for('dashboard.dashboard') }}" class="btn-hero-secondary">
+      View Dashboard
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <span class="hero-stat-num">5</span>
+      <span class="hero-stat-lbl">Job Roles</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">3</span>
+      <span class="hero-stat-lbl">Difficulty Levels</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">7</span>
+      <span class="hero-stat-lbl">Feedback Dimensions</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">100%</span>
+      <span class="hero-stat-lbl">AI-Generated</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══════════════════════════════════════════════════════ -->
+<h2 class="section-title">Everything You Need to Prepare</h2>
+<p class="section-subtitle">From question generation to detailed scoring &mdash; all powered by IBM Granite</p>
+
+<div class="features-grid">
+
+  <div class="feature-card">
+    <div class="feature-icon-wrap">&#128188;</div>
+    <h3>5 Job Roles</h3>
+    <p>Java Developer, Python Developer, Web Developer, Data Analyst, and Software Engineer &mdash; each with a rich knowledge base.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon-wrap">&#129302;</div>
+    <h3>AI Question Generation</h3>
+    <p>IBM Granite generates fresh, role-specific questions every session using Retrieval-Augmented Generation (RAG).</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon-wrap">&#128202;</div>
+    <h3>Structured Feedback</h3>
+    <p>Get a score out of 10 plus feedback on correctness, clarity, completeness, strengths, and suggested improvements.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon-wrap">&#128200;</div>
+    <h3>Progress Dashboard</h3>
+    <p>Track total sessions, answers submitted, and your average score. Review any past session in one click.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon-wrap">&#127891;</div>
+    <h3>3 Difficulty Levels</h3>
+    <p>Beginner for freshers, Intermediate for 1&ndash;3 years experience, and Advanced for senior-level practice.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon-wrap">&#128274;</div>
+    <h3>Responsible AI</h3>
+    <p>Scores are practice estimates only &mdash; not hiring decisions. Your data and credentials stay on your machine.</p>
+  </div>
+
+</div>
+
+<!-- ══ CTA ═══════════════════════════════════════════════════════════ -->
+<div class="cta-strip">
+  <h2>Ready to start practising?</h2>
+  <p>Choose your role, set your difficulty, and let IBM Granite challenge you in under a minute.</p>
+  <div class="cta-buttons">
+    <a href="{{ url_for('interview.setup') }}" class="btn btn-primary btn-lg">
+      Begin Your First Interview &#8594;
+    </a>
+    <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline btn-lg">
+      View Dashboard
+    </a>
+  </div>
+</div>
+
+{% endblock %}

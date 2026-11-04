@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Dashboard &mdash; InterviewMate AI{% endblock %}
+
+{% block content %}
+
+<!-- ══ HEADER ══ -->
+<div class="dash-header">
+  <div>
+    <h1>Your Dashboard</h1>
+    <p>Track your interview practice progress and review past sessions.</p>
+  </div>
+  <a href="{{ url_for('interview.setup') }}" class="btn btn-primary">
+    New Interview &#8594;
+  </a>
+</div>
+
+<!-- ══ STAT CARDS ══ -->
+<div class="stats-grid">
+
+  <div class="stat-card">
+    <div class="stat-icon purple">&#128196;</div>
+    <div class="stat-number">{{ stats.total_sessions or 0 }}</div>
+    <div class="stat-label">Total Sessions Completed</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon blue">&#128221;</div>
+    <div class="stat-number">{{ stats.total_answers or 0 }}</div>
+    <div class="stat-label">Total Answers Evaluated</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon green">&#11088;</div>
+    <div class="stat-number">{{ "%.1f"|format(stats.avg_score or 0) }}</div>
+    <div class="stat-label">Average Score / 10</div>
+  </div>
+
+</div>
+
+<!-- ══ HISTORY TABLE ══ -->
+<div class="section-header">
+  <h2>Interview History</h2>
+  {% if history %}
+  <span class="text-muted" style="font-size:.85rem;">{{ history|length }} session(s)</span>
+  {% endif %}
+</div>
+
+{% if history %}
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Student</th>
+        <th>Role</th>
+        <th>Type</th>
+        <th>Difficulty</th>
+        <th>Questions</th>
+        <th>Avg Score</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in history %}
+      <tr>
+        <td style="color:var(--muted);font-size:.82rem;">{{ loop.index }}</td>
+        <td style="font-size:.87rem;">
+          {%- if s.student_name -%}
+            {{ s.student_name | e }}
+          {%- else -%}
+            <span style="color:var(--muted);">—</span>
+          {%- endif -%}
+        </td>
+        <td class="role-name">{{ s.role }}</td>
+        <td>
+          {% if s.interview_type == "Technical" %}
+            <span class="badge badge-tech">Technical</span>
+          {% elif s.interview_type == "HR" %}
+            <span class="badge badge-hr">HR</span>
+          {% else %}
+            <span class="badge badge-mixed">Mixed</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if s.difficulty == "Beginner" %}
+            <span class="badge badge-beg">Beginner</span>
+          {% elif s.difficulty == "Intermediate" %}
+            <span class="badge badge-int">Intermediate</span>
+          {% else %}
+            <span class="badge badge-adv">Advanced</span>
+          {% endif %}
+        </td>
+        <td>{{ s.total_questions }}</td>
+        <td>
+          {% set sc = s.average_score or 0 %}
+          <strong style="color:{% if sc >= 7 %}var(--success){% elif sc >= 4 %}var(--warning){% else %}var(--danger){% endif %};">
+            {{ "%.1f"|format(sc) }}&thinsp;/&thinsp;10
+          </strong>
+        </td>
+        <td style="color:var(--muted);font-size:.83rem;white-space:nowrap;">
+          {{ s.created_at[:16].replace("T", " ") if s.created_at else "&mdash;" }}
+        </td>
+        <td>
+          <a href="{{ url_for('interview.results', session_id=s.id) }}" class="btn btn-ghost btn-sm">
+            View Results
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+
+<div class="empty-state">
+  <div class="empty-icon">&#128202;</div>
+  <h2>No sessions yet</h2>
+  <p>Complete your first interview to see your history, scores, and progress here.</p>
+  <a href="{{ url_for('interview.setup') }}" class="btn btn-primary btn-lg">
+    Start Your First Interview &#8594;
+  </a>
+</div>
+
+{% endif %}
+
+<!-- ══ BY-ROLE BREAKDOWN ══ -->
+{% if stats.by_role %}
+<div class="section-header" style="margin-top:2.5rem;">
+  <h2>Performance by Role</h2>
+  <span class="text-muted" style="font-size:.85rem;">Average score across completed sessions</span>
+</div>
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Job Role</th>
+        <th>Sessions</th>
+        <th>Average Score</th>
+        <th>Progress</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in stats.by_role %}
+      {% set sc = r.avg_score or 0 %}
+      <tr>
+        <td class="role-name">{{ r.role }}</td>
+        <td>{{ r.sessions }}</td>
+        <td>
+          <strong style="color:{% if sc >= 7 %}var(--success){% elif sc >= 4 %}var(--warning){% else %}var(--danger){% endif %};">
+            {{ "%.1f"|format(sc) }}&thinsp;/&thinsp;10
+          </strong>
+        </td>
+        <td style="width:180px;">
+          <div style="background:var(--border);border-radius:99px;height:8px;overflow:hidden;">
+            <div style="background:{% if sc >= 7 %}var(--success){% elif sc >= 4 %}var(--warning){% else %}var(--danger){% endif %};
+                        width:{{ (sc / 10 * 100)|int }}%;height:100%;border-radius:99px;
+                        transition:width .6s ease;"></div>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

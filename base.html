@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}InterviewMate AI{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<nav class="navbar">
+  <div class="navbar-inner">
+
+    <a href="{{ url_for('interview.index') }}" class="navbar-brand">
+      <span class="brand-logo">&#9651;</span>
+      <span>InterviewMate&nbsp;<span class="brand-ai">AI</span></span>
+    </a>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="navbar-links" id="navbar-links">
+      <li><a href="{{ url_for('interview.index') }}"     class="nav-link">Home</a></li>
+      <li><a href="{{ url_for('interview.setup') }}"     class="nav-link nav-cta">New Interview</a></li>
+      <li><a href="{{ url_for('dashboard.dashboard') }}" class="nav-link">Dashboard</a></li>
+    </ul>
+
+  </div>
+</nav>
+
+<!-- ══════════════ FLASH MESSAGES ══════════════ -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- ══════════════ PAGE CONTENT ══════════════ -->
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <p class="footer-notice">
+      <strong>Responsible AI Notice:</strong>
+      AI-generated scores are estimates for practice only and do not represent hiring decisions.
+      Answers are processed by IBM watsonx.ai. Credentials stay in your local <code>.env</code> file.
+    </p>
+    <p class="footer-copy">&#169; 2024 InterviewMate AI &mdash; Powered by IBM Granite &amp; IBM watsonx.ai</p>
+  </div>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  document.getElementById('nav-toggle').addEventListener('click', function() {
+    document.getElementById('navbar-links').classList.toggle('open');
+  });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

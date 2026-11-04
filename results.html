@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Results &mdash; InterviewMate AI{% endblock %}
+
+{% block content %}
+
+<!-- ══ RESULTS HERO ══ -->
+<div class="results-hero">
+  <div class="score-ring-wrap">
+    <div class="score-ring">
+      <svg viewBox="0 0 100 100">
+        <circle class="track" cx="50" cy="50" r="45"/>
+        <circle class="fill" id="score-circle" cx="50" cy="50" r="45"/>
+      </svg>
+    </div>
+    <div class="score-number" id="score-number">
+      {{ "%.1f"|format(session.average_score or 0) }}
+    </div>
+  </div>
+  <h2>Overall Average Score</h2>
+  <div class="sub">
+    {{ questions|length }} question(s) &nbsp;&bull;&nbsp; {{ session.role }}
+    {% if session.student_name %}&nbsp;&bull;&nbsp; {{ session.student_name }}{% endif %}
+  </div>
+  <div class="session-pills">
+    <span class="session-pill">{{ session.interview_type }}</span>
+    <span class="session-pill">{{ session.difficulty }}</span>
+    <span class="session-pill">Session #{{ session.id }}</span>
+  </div>
+</div>
+
+<!-- ══ AI NOTICE ══ -->
+<div class="ai-notice-card">
+  <span class="ai-notice-icon">&#9888;</span>
+  <span>{{ responsible_ai_notice }}</span>
+</div>
+
+<!-- ══ PER-QUESTION RESULTS ══ -->
+<div class="section-header">
+  <h2>Detailed Question Feedback</h2>
+  <span class="text-muted" style="font-size:.85rem;">Click any question to expand feedback</span>
+</div>
+
+{% for q in questions %}
+{% set score = q.score or 0 %}
+{% if score >= 7 %}{% set chip = "chip-high" %}
+{% elif score >= 4 %}{% set chip = "chip-medium" %}
+{% else %}{% set chip = "chip-low" %}{% endif %}
+
+<div class="result-accordion">
+  <div class="accordion-header" onclick="toggleAccordion(this)">
+    <span class="accordion-q-num">Q{{ q.question_number }}</span>
+    <span class="accordion-q-text">{{ q.question_text }}</span>
+    <span class="score-chip {{ chip }}">{{ "%.1f"|format(score) }}&thinsp;/&thinsp;10</span>
+    <span class="accordion-chevron" id="chevron-{{ q.id }}">&#9660;</span>
+  </div>
+
+  <div class="accordion-body{% if loop.first %} open{% endif %}" id="body-{{ q.id }}">
+
+    <!-- User's answer -->
+    <div class="user-answer">
+      <strong>Your Answer</strong>
+      {{ q.answer_text or "(No answer provided)" }}
+    </div>
+
+    <!-- 2x2 feedback grid -->
+    <div class="feedback-grid">
+      <div class="feedback-cell">
+        <div class="feedback-cell-label">&#10003; Correctness</div>
+        <p>{{ q.correctness or "N/A" }}</p>
+      </div>
+      <div class="feedback-cell">
+        <div class="feedback-cell-label">&#128065; Clarity</div>
+        <p>{{ q.clarity or "N/A" }}</p>
+      </div>
+      <div class="feedback-cell">
+        <div class="feedback-cell-label">&#128203; Completeness</div>
+        <p>{{ q.completeness or "N/A" }}</p>
+      </div>
+      <div class="feedback-cell">
+        <div class="feedback-cell-label">&#11088; Strengths</div>
+        <p>{{ q.strengths or "N/A" }}</p>
+      </div>
+    </div>
+
+    <!-- Improvements -->
+    {% if q.improvements and q.improvements not in ("N/A", "") %}
+    <div class="improvements-block">
+      <strong>&#128161; Suggested Improvements</strong>
+      {{ q.improvements }}
+    </div>
+    {% endif %}
+
+    <!-- Sample answer -->
+    {% if q.sample_answer and q.sample_answer not in ("N/A", "") %}
+    <div class="sample-answer">
+      <strong>&#128218; Model Answer (IBM Granite)</strong>
+      {{ q.sample_answer }}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endfor %}
+
+<!-- ══ ACTION BUTTONS ══ -->
+<div class="flex-gap mt-3">
+  <a href="{{ url_for('interview.setup') }}" class="btn btn-primary btn-lg">
+    Start New Interview &#8594;
+  </a>
+  <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline btn-lg">
+    View Dashboard
+  </a>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Accordion toggle
+  function toggleAccordion(header) {
+    var body    = header.nextElementSibling;
+    var chevron = header.querySelector('.accordion-chevron');
+    var isOpen  = body.classList.contains('open');
+    body.classList.toggle('open');
+    chevron.classList.toggle('open', !isOpen);
+  }
+
+  // Animated score ring on load
+  document.addEventListener('DOMContentLoaded', function() {
+    var rawScore = parseFloat(document.getElementById('score-number').textContent) || 0;
+    var pct      = rawScore / 10;
+    var circumference = 2 * Math.PI * 45; // r=45
+    var offset = circumference * (1 - pct);
+    var circle = document.getElementById('score-circle');
+    if (circle) {
+      circle.style.strokeDasharray  = circumference;
+      circle.style.strokeDashoffset = circumference; // start empty
+      requestAnimationFrame(function() {
+        setTimeout(function() {
+          circle.style.strokeDashoffset = offset;
+        }, 100);
+      });
+    }
+
+    // Colour the ring by score
+    if (rawScore >= 7)       circle.style.stroke = '#34d399';
+    else if (rawScore >= 4)  circle.style.stroke = '#fbbf24';
+    else                     circle.style.stroke = '#f87171';
+  });
+</script>
+{% endblock %}

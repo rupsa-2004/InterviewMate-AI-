@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Setup Interview &mdash; InterviewMate AI{% endblock %}
+
+{% block content %}
+
+<!-- Generating overlay (shown while IBM Granite is called) -->
+<div class="generating-overlay" id="generating-overlay">
+  <div class="generating-box">
+    <div class="spinner"></div>
+    <h3>Generating Your Questions</h3>
+    <p>IBM Granite is creating personalised questions from your knowledge base. This takes 10&ndash;30 seconds&hellip;</p>
+  </div>
+</div>
+
+<div class="page-header">
+  <h1>Configure Your Interview</h1>
+  <p>Select your role, interview type, difficulty, and how many questions you want IBM Granite to generate.</p>
+</div>
+
+<div class="setup-layout">
+
+  <!-- ══ MAIN FORM ══ -->
+  <form action="{{ url_for('interview.generate') }}" method="POST" id="setup-form">
+
+    <div class="setup-card">
+      <div class="setup-card-title">
+        <span class="step-indicator">1</span>
+        Your Name <span style="font-weight:400;font-size:.82rem;color:var(--muted);">(optional)</span>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label" for="student_name">Your name (shown on the dashboard)</label>
+        <input type="text" name="student_name" id="student_name" class="form-control"
+               placeholder="e.g. Arjun Sharma" maxlength="80" autocomplete="name" />
+        <p class="form-hint">Leave blank to remain anonymous.</p>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-card-title">
+        <span class="step-indicator">2</span>
+        Job Role
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label" for="role">Which position are you preparing for?</label>
+        <select name="role" id="role" class="form-control" required>
+          <option value="" disabled selected>Select a job role&hellip;</option>
+          {% for r in roles %}
+          <option value="{{ r }}">{{ r }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-card-title">
+        <span class="step-indicator">3</span>
+        Interview Type
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;">
+        <label class="select-card">
+          <input type="radio" name="interview_type" value="Technical" required />
+          <div class="select-card-body">
+            <span class="select-card-icon">&#128187;</span>
+            <div class="select-card-text">
+              <strong>Technical</strong>
+              <span>Coding &amp; concepts</span>
+            </div>
+          </div>
+        </label>
+        <label class="select-card">
+          <input type="radio" name="interview_type" value="HR" />
+          <div class="select-card-body">
+            <span class="select-card-icon">&#128100;</span>
+            <div class="select-card-text">
+              <strong>HR</strong>
+              <span>Behavioural questions</span>
+            </div>
+          </div>
+        </label>
+        <label class="select-card">
+          <input type="radio" name="interview_type" value="Mixed" />
+          <div class="select-card-body">
+            <span class="select-card-icon">&#9889;</span>
+            <div class="select-card-text">
+              <strong>Mixed</strong>
+              <span>Both types</span>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-card-title">
+        <span class="step-indicator">4</span>
+        Difficulty Level
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;">
+        <label class="select-card">
+          <input type="radio" name="difficulty" value="Beginner" required />
+          <div class="select-card-body">
+            <span class="select-card-icon">&#127793;</span>
+            <div class="select-card-text">
+              <strong>Beginner</strong>
+              <span>Fresher / 0&ndash;1 yr</span>
+            </div>
+          </div>
+        </label>
+        <label class="select-card">
+          <input type="radio" name="difficulty" value="Intermediate" />
+          <div class="select-card-body">
+            <span class="select-card-icon">&#127775;</span>
+            <div class="select-card-text">
+              <strong>Intermediate</strong>
+              <span>1&ndash;3 years exp.</span>
+            </div>
+          </div>
+        </label>
+        <label class="select-card">
+          <input type="radio" name="difficulty" value="Advanced" />
+          <div class="select-card-body">
+            <span class="select-card-icon">&#128293;</span>
+            <div class="select-card-text">
+              <strong>Advanced</strong>
+              <span>3+ years exp.</span>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-card-title">
+        <span class="step-indicator">5</span>
+        Number of Questions
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label" for="question_count">How many questions do you want?</label>
+        <select name="question_count" id="question_count" class="form-control">
+          {% for n in question_counts %}
+          <option value="{{ n }}" {% if n == 5 %}selected{% endif %}>{{ n }} questions{% if n == 3 %} &mdash; Quick session{% elif n == 10 %} &mdash; Full mock interview{% endif %}</option>
+          {% endfor %}
+        </select>
+        <p class="form-hint">More questions = more comprehensive practice and longer evaluation time.</p>
+      </div>
+    </div>
+
+    <div class="flex-gap">
+      <button type="submit" class="btn btn-primary btn-lg" id="generate-btn">
+        Generate Questions &#8594;
+      </button>
+      <a href="{{ url_for('interview.index') }}" class="btn btn-outline">Cancel</a>
+    </div>
+
+  </form>
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside>
+    <div class="sidebar-tip">
+      <h4>How it works</h4>
+      <ul>
+        <li>Your selections are combined with a role-specific knowledge base (RAG).</li>
+        <li>IBM Granite generates unique questions tailored to your exact configuration.</li>
+        <li>You answer each question, then Granite evaluates and scores them.</li>
+        <li>Results are saved to your dashboard for tracking progress.</li>
+      </ul>
+    </div>
+    <div class="loading-hint">
+      <span style="font-size:1.1rem;flex-shrink:0;">&#9200;</span>
+      <div>
+        <strong>Please be patient</strong>
+        Question generation takes 10&ndash;30 seconds. Evaluation takes 30&ndash;60 seconds for a full session. A loading screen will appear.
+      </div>
+    </div>
+  </aside>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('setup-form').addEventListener('submit', function(e) {
+    var role = document.getElementById('role').value;
+    var type = document.querySelector('input[name="interview_type"]:checked');
+    var diff = document.querySelector('input[name="difficulty"]:checked');
+    if (!role || !type || !diff) {
+      e.preventDefault();
+      alert('Please fill in all four fields before generating questions.');
+      return;
+    }
+    document.getElementById('generating-overlay').classList.add('active');
+    document.getElementById('generate-btn').disabled = true;
+    document.getElementById('generate-btn').textContent = 'Generating\u2026';
+  });
+</script>
+{% endblock %}

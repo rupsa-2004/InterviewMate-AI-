@@ -1,0 +1,105 @@
+{
+  "name": "interviewmate-ai",
+  "description": "AI-powered interview preparation platform for B.Tech IT students. Uses IBM watsonx.ai (IBM Granite), Flask, SQLite, and a custom RAG knowledge base to generate interview questions, evaluate answers, and track progress.",
+  "version": "1.0.0",
+  "keywords": [
+    "flask",
+    "ibm-watsonx-ai",
+    "ibm-granite",
+    "rag",
+    "interview-preparation",
+    "ai",
+    "python",
+    "sqlite",
+    "college-project",
+    "btech"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/InterviewMate-AI"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "python app.py",
+    "test:rag": "python tests/test_rag_db.py",
+    "test:integration": "python tests/test_integration.py",
+    "test:connection": "python -m services.granite_service --test",
+    "list-models": "python -m services.granite_service --list-models",
+    "rag-report": "python -m services.rag_service --report"
+  },
+  "environment": {
+    "python_version": ">=3.9",
+    "required_env_vars": [
+      "WATSONX_API_KEY",
+      "WATSONX_PROJECT_ID",
+      "WATSONX_URL",
+      "WATSONX_MODEL_ID"
+    ],
+    "optional_env_vars": [
+      "FLASK_SECRET_KEY",
+      "FLASK_DEBUG"
+    ]
+  },
+  "dependencies": {
+    "flask": ">=3.0.3",
+    "python-dotenv": ">=1.0.1",
+    "ibm-watsonx-ai": ">=1.9.0",
+    "requests": ">=2.32.3"
+  },
+  "entry_point": "app.py",
+  "port": 5000,
+  "database": {
+    "type": "sqlite",
+    "file": "database/interviewmate.db",
+    "auto_init": true,
+    "migration": true
+  },
+  "features": [
+    "AI question generation via IBM Granite",
+    "7-dimension answer evaluation (score, correctness, clarity, completeness, strengths, improvements, sample answer)",
+    "Lightweight keyword-scored RAG from JSON knowledge base",
+    "5 job roles: Java Developer, Python Developer, Web Developer, Data Analyst, Software Engineer",
+    "3 interview types: Technical, HR, Mixed",
+    "3 difficulty levels: Beginner, Intermediate, Advanced",
+    "4 question count options: 3, 5, 7, 10",
+    "Session persistence in SQLite",
+    "Progress dashboard with per-role breakdown",
+    "30-minute countdown timer with auto-submit",
+    "Responsible AI notices on all evaluation pages",
+    "Placeholder credential detection at startup",
+    "XSS-safe student name rendering",
+    "CLI utilities for connection test, model listing, RAG inspection"
+  ],
+  "test_suites": [
+    {
+      "name": "RAG and Database",
+      "file": "tests/test_rag_db.py",
+      "checks": 100,
+      "requires_ibm_credentials": false
+    },
+    {
+      "name": "Integration (Flask + mocked IBM SDK)",
+      "file": "tests/test_integration.py",
+      "checks": 75,
+      "requires_ibm_credentials": false
+    }
+  ],
+  "documentation": {
+    "readme": "README.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "testing_report": "docs/TESTING_REPORT.md",
+    "presentation": "docs/PRESENTATION.md"
+  },
+  "ibm_watsonx": {
+    "default_model": "ibm/granite-3-1-8b-base",
+    "default_region": "eu-de",
+    "default_url": "https://eu-de.ml.cloud.ibm.com",
+    "sdk": "ibm-watsonx-ai",
+    "sdk_version": ">=1.9.0"
+  },
+  "responsible_ai": {
+    "notice": "AI-generated scores are estimates for practice purposes only and do not represent actual hiring decisions.",
+    "data_storage": "Local SQLite only — no data sent to third parties except IBM watsonx.ai for evaluation",
+    "credential_security": "Credentials stored in local .env file, excluded from version control"
+  }
+}

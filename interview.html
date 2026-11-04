@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Interview Session &mdash; InterviewMate AI{% endblock %}
+
+{% block content %}
+
+<!-- ══ SESSION HEADER ══ -->
+<div class="interview-header">
+  <div class="interview-meta">
+    {% if session.student_name %}
+    <div class="meta-item">
+      <span>Student</span>
+      <strong>{{ session.student_name }}</strong>
+    </div>
+    {% endif %}
+    <div class="meta-item">
+      <span>Role</span>
+      <strong>{{ session.role }}</strong>
+    </div>
+    <div class="meta-item">
+      <span>Type</span>
+      <strong>{{ session.interview_type }}</strong>
+    </div>
+    <div class="meta-item">
+      <span>Difficulty</span>
+      <strong>{{ session.difficulty }}</strong>
+    </div>
+    <div class="meta-item">
+      <span>Questions</span>
+      <strong>{{ questions|length }}</strong>
+    </div>
+  </div>
+  <div class="timer-pill" id="timer-pill">
+    &#9201; <span id="timer-text">30:00</span>
+  </div>
+</div>
+
+<!-- ══ PROGRESS BAR ══ -->
+<div class="progress-wrap">
+  <div class="progress-header">
+    <span>Answered</span>
+    <span id="progress-text">0 / {{ questions|length }}</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+</div>
+
+<!-- ══ RESPONSIBLE AI ══ -->
+<p style="font-size:.8rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.55;">
+  <strong style="color:var(--warning);">Notice:</strong> {{ responsible_ai_notice }}
+</p>
+
+<!-- ══ ANSWER FORM ══ -->
+<form action="{{ url_for('interview.submit', session_id=session_id) }}" method="POST" id="interview-form">
+
+  {% for q in questions %}
+  <div class="question-card">
+    <div class="q-label">Question {{ q.question_number }} of {{ questions|length }}</div>
+    <p class="q-text">{{ q.question_text }}</p>
+    <div class="form-group" style="margin-bottom:0;">
+      <label class="form-label" for="answer_{{ q.id }}">Your Answer</label>
+      <textarea
+        name="answer_{{ q.id }}"
+        id="answer_{{ q.id }}"
+        class="form-control answer-textarea"
+        rows="5"
+        placeholder="Write your answer here. Be as detailed and specific as you can &mdash; IBM Granite evaluates depth, accuracy, and clarity."
+        data-qid="{{ q.id }}"
+      ></textarea>
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- ══ SUBMIT BAR ══ -->
+  <div class="submit-bar">
+    <div class="submit-bar-info">
+      <strong>Ready to submit?</strong>
+      Review all your answers above, then click Submit. Evaluation takes 30&ndash;60 seconds.
+    </div>
+    <button type="submit" class="btn btn-success btn-lg" id="submit-btn">
+      Submit All Answers &#8594;
+    </button>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/interview.js') }}"></script>
+<script>
+  startInterview({{ questions|length }}, 30);
+</script>
+{% endblock %}
